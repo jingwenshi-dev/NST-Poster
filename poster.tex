@@ -24,6 +24,9 @@
 \pgfplotsset{compat=1.14}
 \usepackage{anyfontsize}
 
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+
 % ====================
 % Lengths
 % ====================
@@ -41,9 +44,9 @@
 % Title
 % ====================
 
-\title{Some fancy title: followed by some more text}
+\title{Neural Style Transfer: Fundamental Theory and Architecture}
 
-\author{Your Name}
+\author{Jingwen (Steven) Shi}
 
 \institute[shortinst]{University of Toronto}
 
@@ -52,9 +55,9 @@
 % ====================
 
 \footercontent{
-  \href{https://github.com}{Github: https://github.com} \hfill
-ICLR 2023 \hfill
-  \href{mailto:youremail@cs.toronto.edu}{youremail@cs.toronto.edu}}
+  \href{https://github.com/jingwenshi-dev/NST-Poster}{Github: https://github.com/jingwenshi-dev/NST-Poster} \hfill
+CSC490 2023 Fall \hfill
+  \href{mailto:jingwensteven.shi@mail.utoronto.ca}{jingwensteven.shi@mail.utoronto.ca}}
 % (can be left out to remove footer)
 
 % ====================
@@ -71,71 +74,74 @@ ICLR 2023 \hfill
 % ====================
 
 \begin{document}
-
-
-
 \begin{frame}[t]
 \begin{columns}[t]
 \separatorcolumn
 
 \begin{column}{\colwidth}
 
-  \begin{block}{A block title}
+    \begin{block}{Abstract}
+    
+        This poster aims to provide a comprehensive overview of key concepts in neural style transfer including architecture, loss functions, transfer learning, target detaching, and layer choices.
+    
+    \end{block}
 
-    Some block contents, followed by a diagram, followed by a dummy paragraph.
-
-    \begin{figure}
-      \centering
-                    \includegraphics[width=0.6\textwidth]{figures/results_fig.pdf}
-    \end{figure}
-
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ultricies
-    eget libero ac ullamcorper. Integer et euismod ante. Aenean vestibulum
-    lobortis augue, ut lobortis turpis rhoncus sed. Proin feugiat nibh a
-    lacinia dignissim. Proin scelerisque, risus eget tempor fermentum, ex
-    turpis condimentum urna, quis malesuada sapien arcu eu purus.
-
-  \end{block}
-
-  \begin{block}{A block containing a list}
-
-    Nam vulputate nunc felis, non condimentum lacus porta ultrices. Nullam sed
-    sagittis metus. Etiam consectetur gravida urna quis suscipit.
-
-    \begin{itemize}
-      \item \textbf{Mauris tempor} risus nulla, sed ornare
-      \item \textbf{Libero tincidunt} a duis congue vitae
-      \item \textbf{Dui ac pretium} morbi justo neque, ullamcorper
-    \end{itemize}
-
-    Eget augue porta, bibendum venenatis tortor.
-
-  \end{block}
-
-  \begin{alertblock}{A highlighted block}
-
-    This block catches your eye, so \textbf{important stuff} should probably go
-    here.
-
-    Curabitur eu libero vehicula, cursus est fringilla, luctus est. Morbi
-    consectetur mauris quam, at finibus elit auctor ac. Aliquam erat volutpat.
-    Aenean at nisl ut ex ullamcorper eleifend et eu augue. Aenean quis velit
-    tristique odio convallis ultrices a ac odio.
-
-    \begin{itemize}
-      \item \textbf{Fusce dapibus tellus} vel tellus semper finibus. In
-        consequat, nibh sed mattis luctus, augue diam fermentum lectus.
-      \item \textbf{In euismod erat metus} non ex. Vestibulum luctus augue in
-        mi condimentum, at sollicitudin lorem viverra.
-      \item \textbf{Suspendisse vulputate} mauris vel placerat consectetur.
-        Mauris semper, purus ac hendrerit molestie, elit mi dignissim odio, in
-        suscipit felis sapien vel ex.
-    \end{itemize}
-
-    Aenean tincidunt risus eros, at gravida lorem sagittis vel. Vestibulum ante
-    ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae.
-
-  \end{alertblock}
+    \begin{block}{Architecture}
+    
+        Based on the VGG-19 pre-trained model with style loss and content loss layers inserted:
+        
+        \begin{itemize}
+            \item Normalization
+            \item Convolution
+                \tikz[remember picture] \node[coordinate,xshift=1em,yshift=1em] (n1) {}; 
+            \item ReLU
+                \tikz[remember picture] \node[coordinate] (n2) {};
+            \item \textbf{\textcolor{red} {Style Loss}}
+                \tikz[remember picture] \node[coordinate] (n3) {};
+            %%% Rander bracket for the set of items n1-n3 above %%%
+            \begin{tikzpicture}[overlay,remember picture]
+              \path (n3) -| node[coordinate] (n4) {} (n1);
+              \draw[thick,decorate,decoration={brace,amplitude=10pt,aspect=0.5}]
+                    (n1) -- (n4) node[midway, right=0.5em] {x2};
+            \end{tikzpicture}
+            %======================================================
+            \item Max Pooling
+            \item Convolution
+                \tikz[remember picture] \node[coordinate,xshift=1em,yshift=1em] (n4) {}; 
+            \item ReLU
+                \tikz[remember picture] \node[coordinate] (n5) {};
+            \item \textbf{\textcolor{red} {Style Loss}}
+                \tikz[remember picture] \node[coordinate] (n6) {};
+            %%% Rander bracket for the set of items n4-n7 above %%%
+            \begin{tikzpicture}[overlay,remember picture]
+              \path (n6) -| node[coordinate] (n7) {} (n4);
+              \draw[thick,decorate,decoration={brace,amplitude=10pt,aspect=0.5}]
+                    (n4) -- (n7) node[midway, right=0.5em] {x2};
+            \end{tikzpicture}
+            %======================================================
+            \item \textbf{\textcolor{blue} {Content Loss}}
+            \item Max Pooling
+            \item Convolution
+            \item ReLU
+            \item \textbf{\textcolor{red} {Style Loss}}
+        \end{itemize}
+        
+        The model does not include all the layers of VGG-19. In fact, the model got cut off and abandoned all the layers after the last loss layer was inserted for several reasons:
+        \begin{itemize}
+            \item \textbf{Focus on Style Features:\\}
+            Neural style transfer aims to merge the content of an image with the style of another. By cutting off the model after the last loss layer, the model can focus on the style feature better and the rest of the VGG-19 layers are simply not helpful.
+            \item \textbf{Computation Efficiency:\\}
+            VGG-19 is a type of CNN model, the more layers a model has, the more computing-intensive it is. By cutting off the model, the layers are not necessarily for capturing content and style will not be computed.
+        \end{itemize}
+        
+        \begin{figure}
+          \centering
+            \includegraphics[width=0.75\textwidth]{figures/NST Architecture.png}
+        
+            \caption{Neural Style Transfer Architecture (source: V7 Labs)}
+        \end{figure}
+    
+    \end{block}
 
 \end{column}
 
@@ -143,55 +149,49 @@ ICLR 2023 \hfill
 
 \begin{column}{\colwidth}
 
-  \begin{block}{A block containing an enumerated list}
+  \begin{alertblock}{Losses}
 
-    Vivamus congue volutpat elit non semper. Praesent molestie nec erat ac
-    interdum. In quis suscipit erat. \textbf{Phasellus mauris felis, molestie
-    ac pharetra quis}, tempus nec ante. Donec finibus ante vel purus mollis
-    fermentum. Sed felis mi, pharetra eget nibh a, feugiat eleifend dolor. Nam
-    mollis condimentum purus quis sodales. Nullam eu felis eu nulla eleifend
-    bibendum nec eu lorem. Vivamus felis velit, volutpat ut facilisis ac,
-    commodo in metus.
+    The complete loss is the sum of the content and style loss since the goal is to minimize the joint losses on the generated image.
 
-    \begin{enumerate}
-      \item \textbf{Morbi mauris purus}, egestas at vehicula et, convallis
-        accumsan orci. Orci varius natoque penatibus et magnis dis parturient
-        montes, nascetur ridiculus mus.
-      \item \textbf{Cras vehicula blandit urna ut maximus}. Aliquam blandit nec
-        massa ac sollicitudin. Curabitur cursus, metus nec imperdiet bibendum,
-        velit lectus faucibus dolor, quis gravida metus mauris gravida turpis.
-      \item \textbf{Vestibulum et massa diam}. Phasellus fermentum augue non
-        nulla accumsan, non rhoncus lectus condimentum.
-    \end{enumerate}
+    $$
+    \mathcal{L}_{total}(p, a, x) = \alpha\mathcal{L}_{content}(p, x) + \beta\mathcal{L}_{style}(a, x)
+    $$
+    where:
+    \begin{itemize}
+        \item $\alpha$ and $\beta$ are weighting factors that determine the relative importance of the content and style.
+        \item p, a, x are the content, style, and input images.
+    \end{itemize}
 
-  \end{block}
+  \end{alertblock}
 
-  \begin{block}{Fusce aliquam magna velit}
+  \begin{block}{Content Loss}
 
-    Et rutrum ex euismod vel. Pellentesque ultricies, velit in fermentum
-    vestibulum, lectus nisi pretium nibh, sit amet aliquam lectus augue vel
-    velit. Suspendisse rhoncus massa porttitor augue feugiat molestie. Sed
-    molestie ut orci nec malesuada. Sed ultricies feugiat est fringilla
-    posuere.
+    Each content loss is the mean square error (MSE) between the feature representation of content and the input image. It measures the difference between the generated image and the content image.
 
-    \begin{figure}
-      \centering
-        \includegraphics[width=0.3\textwidth]{figures/dag.png}
-
-      \caption{Another figure caption.}
-    \end{figure}
+    $$\mathcal{L}_{content}(p, x, l) = \frac{1}{n} \sum_{i, j}(F^l_{i, j}(x) - F^l_{i, j}(p))^2$$
+    where:
+    \begin{itemize}
+        \item $F^l_{i, j}$ is the feature map at layer l.
+    \end{itemize}
 
   \end{block}
 
-  \begin{block}{Nam cursus consequat egestas}
+  \begin{block}{Style Loss}
 
-    Nulla eget sem quam. Ut aliquam volutpat nisi vestibulum convallis. Nunc a
-    lectus et eros facilisis hendrerit eu non urna. Interdum et malesuada fames
-    ac ante \textit{ipsum primis} in faucibus. Etiam sit amet velit eget sem
-    euismod tristique. Praesent enim erat, porta vel mattis sed, pharetra sed
-    ipsum. Morbi commodo condimentum massa, \textit{tempus venenatis} massa
-    hendrerit quis. Maecenas sed porta est. Praesent mollis interdum lectus,
-    sit amet sollicitudin risus tincidunt non.
+    Style loss uses the same methodology as the content loss for calculation except now it has an additional step of calculation Gram matrix before before input to the MSE.
+    
+    $$\mathcal{L}_{content}(a, x, l) = \frac{1}{4 N^2_l M^2_l} \sum (G^l(x) - G^l(a))^2 $$
+    where:
+    \begin{itemize}
+        \item $G^l$ is the Gram matrix of the feature map at layer $l$.
+        \item $N_l$ is the number of feature maps at layer $l$.
+        \item $M_l$ is the size of each feature map at layer $l$.
+    \end{itemize}
+
+  \end{block}
+
+
+  \begin{block}{Why not Covariance Matrix?}
 
     Etiam sit amet tempus lorem, aliquet condimentum velit. Donec et nibh
     consequat, sagittis ex eget, dictum orci. Etiam quis semper ante. Ut eu
