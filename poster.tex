@@ -44,7 +44,7 @@
 % Title
 % ====================
 
-\title{Neural Style Transfer: Fundamental Theory and Architecture}
+\title{Neural Style Transfer:\\ Fundamental Theory and Architecture}
 
 \author{Jingwen (Steven) Shi}
 
@@ -89,42 +89,13 @@ CSC490 2023 Fall \hfill
     \begin{block}{Architecture}
     
         Based on the VGG-19 pre-trained model with style loss and content loss layers inserted:
+
+        \begin{figure}
+          \centering
+            \includegraphics[width=1\textwidth]{figures/NST Architecture.png}
         
-        \begin{itemize}
-            \item Normalization
-            \item Convolution
-                \tikz[remember picture] \node[coordinate,xshift=1em,yshift=1em] (n1) {}; 
-            \item ReLU
-                \tikz[remember picture] \node[coordinate] (n2) {};
-            \item \textbf{\textcolor{red} {Style Loss}}
-                \tikz[remember picture] \node[coordinate] (n3) {};
-            %%% Rander bracket for the set of items n1-n3 above %%%
-            \begin{tikzpicture}[overlay,remember picture]
-              \path (n3) -| node[coordinate] (n4) {} (n1);
-              \draw[thick,decorate,decoration={brace,amplitude=10pt,aspect=0.5}]
-                    (n1) -- (n4) node[midway, right=0.5em] {x2};
-            \end{tikzpicture}
-            %======================================================
-            \item Max Pooling
-            \item Convolution
-                \tikz[remember picture] \node[coordinate,xshift=1em,yshift=1em] (n4) {}; 
-            \item ReLU
-                \tikz[remember picture] \node[coordinate] (n5) {};
-            \item \textbf{\textcolor{red} {Style Loss}}
-                \tikz[remember picture] \node[coordinate] (n6) {};
-            %%% Rander bracket for the set of items n4-n7 above %%%
-            \begin{tikzpicture}[overlay,remember picture]
-              \path (n6) -| node[coordinate] (n7) {} (n4);
-              \draw[thick,decorate,decoration={brace,amplitude=10pt,aspect=0.5}]
-                    (n4) -- (n7) node[midway, right=0.5em] {x2};
-            \end{tikzpicture}
-            %======================================================
-            \item \textbf{\textcolor{blue} {Content Loss}}
-            \item Max Pooling
-            \item Convolution
-            \item ReLU
-            \item \textbf{\textcolor{red} {Style Loss}}
-        \end{itemize}
+            \caption{Neural Style Transfer Architecture (source: V7 Labs)}
+        \end{figure}
         
         The model does not include all the layers of VGG-19. In fact, the model got cut off and abandoned all the layers after the last loss layer was inserted for several reasons:
         \begin{itemize}
@@ -133,12 +104,12 @@ CSC490 2023 Fall \hfill
             \item \textbf{Computation Efficiency:\\}
             VGG-19 is a type of CNN model, the more layers a model has, the more computing-intensive it is. By cutting off the model, the layers are not necessarily for capturing content and style will not be computed.
         \end{itemize}
-        
+
         \begin{figure}
           \centering
-            \includegraphics[width=0.75\textwidth]{figures/NST Architecture.png}
+            \includegraphics[width=1\textwidth]{figures/NST Flowchart.png}
         
-            \caption{Neural Style Transfer Architecture (source: V7 Labs)}
+            \caption{Neural Style Transfer Flowchart}
         \end{figure}
     
     \end{block}
@@ -149,7 +120,7 @@ CSC490 2023 Fall \hfill
 
 \begin{column}{\colwidth}
 
-  \begin{alertblock}{Losses}
+  \begin{block}{Total Loss}
 
     The complete loss is the sum of the content and style loss since the goal is to minimize the joint losses on the generated image.
 
@@ -162,7 +133,7 @@ CSC490 2023 Fall \hfill
         \item p, a, x are the content, style, and input images.
     \end{itemize}
 
-  \end{alertblock}
+  \end{block}
 
   \begin{block}{Content Loss}
 
@@ -178,43 +149,27 @@ CSC490 2023 Fall \hfill
 
   \begin{block}{Style Loss}
 
-    Style loss uses the same methodology as the content loss for calculation except now it has an additional step of calculation Gram matrix before before input to the MSE.
+    Style loss uses the same methodology as content loss to calculate the distance between the feature maps.
     
-    $$\mathcal{L}_{content}(a, x, l) = \frac{1}{4 N^2_l M^2_l} \sum (G^l(x) - G^l(a))^2 $$
+    $$\mathcal{L}_{style}(a, x, l) = \frac{1}{4 N^2_l M^2_l} \sum (G^l(x) - G^l(a))^2 $$
     where:
     \begin{itemize}
-        \item $G^l$ is the Gram matrix of the feature map at layer $l$.
+        \item $a$ is the style image.
+        \item $\frac{1}{4 N^2_l M^2_l}$ is the normalization factor.
+            \begin{itemize}
+                \vskip1ex
+                \item N is the number of feature maps.
+                \item M is the size of each feature map.
+                \item 4 scales down the values to make the products of multiplications manageable.
+                \vskip1ex
+            \end{itemize}
+        \item $G^l = F \cdot F^T$ is the Gram matrix of the feature map at layer $l$
         \item $N_l$ is the number of feature maps at layer $l$.
         \item $M_l$ is the size of each feature map at layer $l$.
     \end{itemize}
 
-  \end{block}
-
-
-  \begin{block}{Why not Covariance Matrix?}
-
-    Etiam sit amet tempus lorem, aliquet condimentum velit. Donec et nibh
-    consequat, sagittis ex eget, dictum orci. Etiam quis semper ante. Ut eu
-    mauris purus. Proin nec consectetur ligula. Mauris pretium molestie
-    ullamcorper. Integer nisi neque, aliquet et odio non, sagittis porta justo.
-
-    \begin{itemize}
-      \item \textbf{Sed consequat} id ante vel efficitur. Praesent congue massa
-        sed est scelerisque, elementum mollis augue iaculis.
-        \begin{itemize}
-          \item In sed est finibus, vulputate
-            nunc gravida, pulvinar lorem. In maximus nunc dolor, sed auctor eros
-            porttitor quis.
-          \item Fusce ornare dignissim nisi. Nam sit amet risus vel lacus
-            tempor tincidunt eu a arcu.
-          \item Donec rhoncus vestibulum erat, quis aliquam leo
-            gravida egestas.
-        \end{itemize}
-      \item \textbf{Sed luctus, elit sit amet} dictum maximus, diam dolor
-        faucibus purus, sed lobortis justo erat id turpis.
-      \item \textbf{Pellentesque facilisis dolor in leo} bibendum congue.
-        Maecenas congue finibus justo, vitae eleifend urna facilisis at.
-    \end{itemize}
+    \heading{Role of Gram Matrix}
+    The Gram matrix is the product of a feature map with its transpose. It captures the coloration between feature maps which represents the style of the image.
 
   \end{block}
 
@@ -224,66 +179,43 @@ CSC490 2023 Fall \hfill
 
 \begin{column}{\colwidth}
 
-  \begin{exampleblock}{A highlighted block containing some math}
+  \begin{alertblock}{Why not Covariance Matrix}
 
-    A different kind of highlighted block.
+    In the formula below, it is clear that the only major difference between the Gram and covariance matrices is that the Gram matrix does not subtract from the sample mean.
+    
+    $$Cov = \frac{1}{N-1} (F-\bar{F})\cdot(F-\bar{F})^T$$
 
-    $$
-    \int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}
-    $$
+    This ignores the spatial arrangement of the features and is ideal for capturing the overall style of the textures:
 
-    Interdum et malesuada fames $\{1, 4, 9, \ldots\}$ ac ante ipsum primis in
-    faucibus. Cras eleifend dolor eu nulla suscipit suscipit. Sed lobortis non
-    felis id vulputate.
+    \begin{enumerate}
+        \item In the covariance matrix, the mean of each feature is subtracted from the feature values which center the data with respect to 0.
+        \item In image processing, these features may related to pixel intensities (i.e. RGB values) and centers data around the mean will capture the intensity of one feature related to the presence of another.
+        \item Gram matrix does not subtract from the mean which only focuses on the overall frequency of feature co-occurrences.
+    \end{enumerate}
 
-    \heading{A heading inside a block}
+    The elements like brushstrokes and colour palettes are parts of the style that should not depend on the positioning of objects. Therefore, the ability that the Gram matrix can abstract away from these spatial relationships and only focus on the overall presence of the feature maps, is exactly what we need.
 
-    Praesent consectetur mi $x^2 + y^2$ metus, nec vestibulum justo viverra
-    nec. Proin eget nulla pretium, egestas magna aliquam, mollis neque. Vivamus
-    dictum $\mathbf{u}^\intercal\mathbf{v}$ sagittis odio, vel porta erat
-    congue sed. Maecenas ut dolor quis arcu auctor porttitor.
+  \end{alertblock}
 
-    \heading{Another heading inside a block}
+  \begin{exampleblock}{Choice of Layers}
 
-    Sed augue erat, scelerisque a purus ultricies, placerat porttitor neque.
-    Donec $P(y \mid x)$ fermentum consectetur $\nabla_x P(y \mid x)$ sapien
-    sagittis egestas. Duis eget leo euismod nunc viverra imperdiet nec id
-    justo.
+    \textbf{Content Layers: \{ReLU 10\}}\\
+    
+    \textbf{Style Layers: \{ReLU 1, ReLU 3, ReLU 5, ReLU 9, ReLU 13\}}
+
+    \heading{Properties of Layer}
+    \begin{enumerate}
+        \item The lower the layer, the better it can capture the details and patterns of an image.
+        \item The higher the layer, the better it can capture the overall abstraction of an image.
+    \end{enumerate}
+
+    \heading{Why ReLU 1, 3, 5, 9, 13?}
+    Since the input is a copy of the content image, lower style layers can quickly merge the style patterns to the input image.
+
+    \heading{Why ReLU 10?}
+    A middle content layer can effectively preserve the input's content. If a lower content layer is used, the output will closely resemble pixel-level copies of the content. However, given that the input is already a replication of the content image, there's no necessity to employ a lower content layer, as it might overshadow the style.
 
   \end{exampleblock}
-
-  \begin{block}{Nullam vel erat at velit convallis laoreet}
-
-    Class aptent taciti sociosqu ad litora torquent per conubia nostra, per
-    inceptos himenaeos. Phasellus libero enim, gravida sed erat sit amet,
-    scelerisque congue diam. Fusce dapibus dui ut augue pulvinar iaculis.
-
-    \begin{table}
-      \centering
-      \begin{tabular}{l r r c}
-        \toprule
-        \textbf{First column} & \textbf{Second column} & \textbf{Third column} & \textbf{Fourth} \\
-        \midrule
-        Foo & 13.37 & 384,394 & $\alpha$ \\
-        Bar & 2.17 & 1,392 & $\beta$ \\
-        Baz & 3.14 & 83,742 & $\delta$ \\
-        Qux & 7.59 & 974 & $\gamma$ \\
-        \bottomrule
-      \end{tabular}
-      \caption{A table caption.}
-    \end{table}
-
-    Donec quis posuere ligula. Nunc feugiat elit a mi malesuada consequat. Sed
-    imperdiet augue ac nibh aliquet tristique. Aenean eu tortor vulputate,
-    eleifend lorem in, dictum urna. Proin auctor ante in augue tincidunt
-    tempor. Proin pellentesque vulputate odio, ac gravida nulla posuere
-    efficitur. Aenean at velit vel dolor blandit molestie. Mauris laoreet
-    commodo quam, non luctus nibh ullamcorper in. Class aptent taciti sociosqu
-    ad litora torquent per conubia nostra, per inceptos himenaeos.
-
-
-
-  \end{block}
 
   \begin{block}{References}
 
