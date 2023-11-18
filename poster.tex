@@ -142,6 +142,8 @@ CSC490 2023 Fall \hfill
     $$\mathcal{L}_{content}(p, x, l) = \frac{1}{n} \sum_{i, j}(F^l_{i, j}(x) - F^l_{i, j}(p))^2$$
     where:
     \begin{itemize}
+        \item $p$ is the content image.
+        \item $x$ is the input image.
         \item $F^l_{i, j}$ is the feature map at layer l.
     \end{itemize}
 
@@ -155,6 +157,7 @@ CSC490 2023 Fall \hfill
     where:
     \begin{itemize}
         \item $a$ is the style image.
+        \item $x$ is the input image.
         \item $\frac{1}{4 N^2_l M^2_l}$ is the normalization factor.
             \begin{itemize}
                 \vskip1ex
